@@ -1,0 +1,12 @@
+[package]
+name = "rtop"
+version = "0.1.0"
+edition = "2021"
+authors = ["Priyanshu Srivastava <priyanshusrivastava4705@gmail.com>"]
+description = "A basic port of htop"
+license = "MIT"
+keywords = ["htop", "system", "sysinfo", "cpu", "processor"]
+
+[dependencies]
+crossterm = "0.28.1"
+sysinfo = "0.32.0"
