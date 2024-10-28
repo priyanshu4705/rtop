@@ -11,12 +11,9 @@ use std::{
 use sysinfo::System;
 
 fn main() {
-    let frame_duration = Duration::from_millis(2000/3);
+    let frame_duration = Duration::from_millis(500);
     let mut sys = System::new_all();
     sys.refresh_all();
-
-    let mut prev_cpu_output = String::new();
-    let mut prev_memory_output = String::new();
 
     execute!(stdout(), Clear(ClearType::All)).unwrap();
 
@@ -24,7 +21,6 @@ fn main() {
         let frame_start = Instant::now();
         sys.refresh_all();
 
-        // Prepare CPU output in a string buffer to avoid excessive screen clearing
         let mut cpu_output = String::new();
         cpu_output.push_str("CPU Usage:\n");
         for (i, processor) in sys.cpus().iter().enumerate() {
@@ -39,7 +35,6 @@ fn main() {
             ));
         }
 
-        // Prepare memory output in a string buffer to avoid excessive screen clearing
         let mut memory_output = String::new();
         memory_output.push_str("Memory Usage:\n");
         memory_output.push_str(&format!(
@@ -59,24 +54,16 @@ fn main() {
             sys.used_swap() / (1024 * 1024)
         ));
 
-        execute!(stdout(), Hide).unwrap(); // Hide the cursor for better visuals
+        execute!(stdout(), Hide).unwrap();
 
-        // Only update CPU section if there's a change
-        if cpu_output != prev_cpu_output {
-            execute!(stdout(), MoveTo(0, 0)).unwrap();
-            print!("{}", cpu_output);
-            prev_cpu_output = cpu_output.clone();
-        }
+        execute!(stdout(), MoveTo(0, 0)).unwrap();
+        print!("{}", cpu_output);
 
-        // Only update memory section if there's a change
-        if memory_output != prev_memory_output {
-            execute!(stdout(), MoveTo(0, (sys.cpus().len() + 2) as u16)).unwrap();
-            print!("{}", memory_output);
-            prev_memory_output = memory_output.clone();
-        }
+        execute!(stdout(), MoveTo(0, (sys.cpus().len() + 2) as u16)).unwrap();
+        print!("{}", memory_output);
 
         stdout().flush().unwrap();
-        execute!(stdout(), Show).unwrap(); // Show cursor back
+        execute!(stdout(), Show).unwrap();
 
         let frame_time = frame_start.elapsed();
         if frame_duration > frame_time {
